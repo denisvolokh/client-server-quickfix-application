@@ -1,14 +1,14 @@
 import quickfix
-from server.acceptor_app import AcceptorApplication
+from client.client_app import InitiatorApplication
 
-file_name = "acceptor.cfg"
+file_name = "initiator.cfg"
 
 try:
     settings = quickfix.SessionSettings(file_name)
-    application = AcceptorApplication()
+    application = InitiatorApplication()
     store_factory = quickfix.FileStoreFactory(settings)
     log_factory = quickfix.FileLogFactory(settings)
-    acceptor = quickfix.SocketAcceptor(application, store_factory, settings, log_factory)
+    acceptor = quickfix.SocketInitiator(application, store_factory, settings, log_factory)
 
     acceptor.start()
 

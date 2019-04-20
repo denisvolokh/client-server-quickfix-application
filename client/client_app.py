@@ -3,7 +3,7 @@ import logging
 
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
-logger = logging.getLogger("acceptor_app")
+logger = logging.getLogger("client_app")
 file_handler = logging.FileHandler('logs/app.logs')
 
 file_handler.setFormatter(formatter)
@@ -15,7 +15,7 @@ console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 
-class AcceptorApplication(Application):
+class InitiatorApplication(Application):
 
     def onCreate(self, arg0):
         logger.info("[+] On Create: {}".format(arg0))
@@ -41,3 +41,8 @@ class AcceptorApplication(Application):
 
     def fromAdmin(self, message, session_id):
         logger.info("[+] On fromAdmin: %s" % message)
+
+    def run(self):
+
+        while True:
+            continue
