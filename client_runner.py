@@ -1,7 +1,7 @@
 import quickfix
 from client.client_app import InitiatorApplication
 
-file_name = "initiator.cfg"
+file_name = "client/initiator.cfg"
 
 try:
     settings = quickfix.SessionSettings(file_name)

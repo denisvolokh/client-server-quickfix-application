@@ -44,5 +44,19 @@ class InitiatorApplication(Application):
 
     def run(self):
 
+        print '''
+        Press 1 to send message
+        Press 2 to quit
+        '''
+
         while True:
-            continue
+            input = raw_input()
+
+            if input == "1":
+                pass
+
+            elif input == "2":
+                break
+
+            else:
+                continue
