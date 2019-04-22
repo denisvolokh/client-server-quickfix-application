@@ -47,6 +47,9 @@ class AcceptorApplication(Application):
         if message_type_value == fix.MsgType(fix.MsgType_SecurityDefinitionRequest).getValue():
             logger.info("   [+] Received Security Definition Request!")
 
+        if message_type_value == fix.MsgType(fix.MsgType_TradeCaptureReportRequest).getValue():
+            logger.info("   [+] Received Trade Capture Report Request!")
+
         return
 
     def toAdmin(self, message, session_id):
