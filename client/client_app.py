@@ -1,4 +1,5 @@
 from quickfix import Application
+import quickfix as fix
 import logging
 
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -17,10 +18,14 @@ logger.addHandler(console_handler)
 
 class InitiatorApplication(Application):
 
-    def onCreate(self, arg0):
-        logger.info("[+] On Create: {}".format(arg0))
+    def onCreate(self, session_id):
+        logger.info("[+] On Create: {}".format(session_id))
 
         return
+
+    def onLogon(self, session_id):
+        self.session_id = session_id
+        logger.info("[+] Successful Logon to session '%s'." % session_id.toString())
 
     def onLogout(self, session_id):
         logger.info("[+] On Logout: %s" % session_id)
@@ -42,10 +47,23 @@ class InitiatorApplication(Application):
     def fromAdmin(self, message, session_id):
         logger.info("[+] On fromAdmin: %s" % message)
 
+    def send_SecurityDefinitionRequest_message(self):
+        msg = fix.Message()
+        msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX44))
+        msg.getHeader().setField(fix.MsgType(fix.MsgType_SecurityDefinitionRequest))
+        msg.getHeader().setField(fix.SecurityReqID("123"))
+        msg.getHeader().setField(fix.SecurityRequestType(0))
+
+        try:
+            fix.Session.sendToTarget(msg, self.session_id)
+
+        except Exception:
+            logger.info("[!!!] Session Not found!")
+
     def run(self):
 
         print '''
-        Press 1 to send message
+        Press 1 to send SecurityDefinitionRequest message
         Press 2 to quit
         '''
 
@@ -53,10 +71,14 @@ class InitiatorApplication(Application):
             input = raw_input()
 
             if input == "1":
-                pass
+                self.send_SecurityDefinitionRequest_message()
 
             elif input == "2":
                 break
+
+            elif input == 'd':
+                import pdb
+                pdb.set_trace()
 
             else:
                 continue
