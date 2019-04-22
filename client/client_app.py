@@ -49,7 +49,7 @@ class InitiatorApplication(Application):
 
     def send_SecurityDefinitionRequest_message(self):
         msg = fix.Message()
-        msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX44))
+        msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
         msg.getHeader().setField(fix.MsgType(fix.MsgType_SecurityDefinitionRequest))
         msg.getHeader().setField(fix.SecurityReqID("123"))
         msg.getHeader().setField(fix.SecurityRequestType(0))
