@@ -33,10 +33,19 @@ class InitiatorApplication(Application):
 
     def toApp(self, message, session_id):
         logger.info("[+] On toApp: %s" % message)
+
         return
 
     def fromApp(self, message, session_id):
         logger.info("[+] On fromApp: %s" % message)
+
+        message_type_field = fix.MsgType()
+        message.getHeader().getField(message_type_field)
+        message_type_value = message_type_field.getValue()
+
+        if message_type_value == fix.MsgType(fix.MsgType_TradeCaptureReportAck).getValue():
+            logger.info("   [+] Received Trade Report Ack message!")
+
         return
 
     def toAdmin(self, message, session_id):
@@ -65,6 +74,7 @@ class InitiatorApplication(Application):
         msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
         msg.getHeader().setField(fix.MsgType(fix.MsgType_TradeCaptureReportRequest))
         msg.getHeader().setField(fix.TradeRequestID("Trade-Request-Id"))
+        msg.setField(fix.StringField(263, fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
 
         try:
             fix.Session.sendToTarget(msg, self.session_id)

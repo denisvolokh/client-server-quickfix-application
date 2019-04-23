@@ -1,5 +1,6 @@
 from quickfix import Application
 import quickfix as fix
+import requests
 import logging
 
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -15,11 +16,14 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
+SUBSCRIPTION_TYPES = {
+    "0": "Snapshot",
+    "1": "Snapshot + Updates",
+    "2": "Disable Previous"
+}
+
 
 class AcceptorApplication(Application):
-
-    # def __init__(self, *args, **kwargs):
-    #     super(Application, self).__init__(*args, **kwargs)
 
     def onCreate(self, session_id):
         self.session_id = session_id
@@ -47,8 +51,28 @@ class AcceptorApplication(Application):
         if message_type_value == fix.MsgType(fix.MsgType_SecurityDefinitionRequest).getValue():
             logger.info("   [+] Received Security Definition Request!")
 
+            response = requests.get(url="http://127.0.0.1:5555/bonds")
+            logger.info("   [+] API response: {0}".format(response.json()))
+
         if message_type_value == fix.MsgType(fix.MsgType_TradeCaptureReportRequest).getValue():
             logger.info("   [+] Received Trade Capture Report Request!")
+
+            subscription_type_field = fix.SubscriptionRequestType()
+            message.getField(subscription_type_field)
+            subscription_type_value = subscription_type_field.getValue()
+            logger.info("   [+] Subscription Type: {}".format(SUBSCRIPTION_TYPES.get(subscription_type_value)))
+
+            ack_message = fix.Message()
+            ack_message.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
+            ack_message.getHeader().setField(fix.MsgType(fix.MsgType_TradeCaptureReportAck))
+            ack_message.setField(fix.TrdRptStatus(fix.TrdRptStatus_ACCEPTED))
+            logger.info("   [+] Sending Ack message!")
+
+            try:
+                fix.Session.sendToTarget(ack_message, self.session_id)
+
+            except Exception:
+                logger.info("[!!!] Session Not found!")
 
         return
 
