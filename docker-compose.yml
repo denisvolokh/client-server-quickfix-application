@@ -1,72 +1,32 @@
-version: "2"
+version: '3.3'
 
 services:
 
-  redis:
-    image: redis
-    ports:
-      - 6379:6379
-
-  fix-worker:
-    environment:
-      EXANTE_ACCOUNTS: "TFQ6364.001,TFQ6364.002,TFQ6364.003,TFQ6364.004,TFQ6364.005,TFQ6364.006,TFQ6364.007,TFQ6364.008,TFQ6364.009,TFQ6364.010,TFQ6364.011,TFQ6364.012,TFQ6364.013,TFQ6364.014,TFQ6364.015"
-      MONGODB_PASS: "MyPass123"
-      MONGO: "db"
-      REDIS: "redis"
-    volumes:
-      - .:/application
-      - /tmp/:/tmp
+  restapi:
+    container_name: restapi
     build:
-      dockerfile: Dockerfile.exante
-      context: .
-    depends_on:
-      - redis
-      - db
-    links:
-      - db
-      - redis
-
-  celery-worker:
-    environment:
-      NAV: 200000
-      MAXPCT: 0.2
-      TOP: 250
-      TIERS: 3
-      SIGNALS_PRIMARY_SERVER: "75.160.176.56"
-      SIGNALS_SECONDARY_SERVER: "71.39.112.133"
-      SIGNALS_LOCATION_PATH: "/home/scott/"
-      SIGNALS_SERVER_USERNAME: "scott"
-      MONGODB_PASS: "MyPass123"
-      MONGO: "db"
-      REDIS: "redis"
-      EXCHANGES: "AMEX,NASDAQ,NYSE"
-      EXANTE_API_ENDPOINT: "https://api-demo.exante.eu/md/1.0/"
-      EXANTE_APP_ID: "bf89a231-c2f1-490d-be91-e749c8a2f433"
-      EXANTE_SHARED_KEY: "KpiZsuCJx3eH8F/62jRH+OziAcKGgrUN"
-      EXANTE_CLIENT_ID: "b25efa10-862d-4c82-b62f-2dff1e86fb96"
-      EXANTE_ACCOUNTS: "TFQ6364.001,TFQ6364.002,TFQ6364.003,TFQ6364.004,TFQ6364.005,TFQ6364.006,TFQ6364.007,TFQ6364.008,TFQ6364.009,TFQ6364.010,TFQ6364.011,TFQ6364.012,TFQ6364.013,TFQ6364.014,TFQ6364.015"
-      SLACKBOT_API: "xoxb-154557143953-T53OailmeRMo7VXmkKAvp4aG"
-      SLACKBOT_CHANNEL: "fund_sim_bill"
+      dockerfile: restapi.dockerfile
+      context: ./restapi
     volumes:
-      - .:/application
-      - /tmp/:/tmp
-    build:
-      dockerfile: Dockerfile.tasks
-      context: .
-    depends_on:
-      - redis
-      - db
-    links:
-      - db
-      - redis
-
-  db:
-    image: noviscinet/protected-mongodb
-    environment:
-      MONGODB_PASS: "MyPass123"
-    volumes:
-      - ./mongo:/data/db
-    expose:
-      - "27017"
+      - ./restapi:/code
     ports:
-      - 27334:27017
+      - "5555:5555"
+
+  client:
+    container_name: client
+    build:
+      dockerfile: client.dockerfile
+      context: ./client
+    tty: true
+    links:
+      - restapi
+
+  server:
+    container_name: server
+    build:
+      dockerfile: server.dockerfile
+      context: ./server
+    links:
+      - restapi
+    ports:
+      - "3333:3333"
