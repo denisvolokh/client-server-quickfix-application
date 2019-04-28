@@ -1,7 +1,7 @@
 import quickfix
-from server.acceptor_app import AcceptorApplication
+from acceptor_app import AcceptorApplication
 
-file_name = "server/acceptor.cfg"
+file_name = "acceptor.cfg"
 
 try:
     settings = quickfix.SessionSettings(file_name)

@@ -5,7 +5,7 @@ import logging
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
 logger = logging.getLogger("client_app")
-file_handler = logging.FileHandler('logs/app.logs')
+file_handler = logging.FileHandler('app.logs')
 
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -85,6 +85,11 @@ class InitiatorApplication(Application):
 
         except Exception:
             logger.info("[!!!] Session Not found!")
+
+    # def run(self):
+    #
+    #     while True:
+    #         continue
 
     def run(self):
 
