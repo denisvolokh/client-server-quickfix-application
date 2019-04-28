@@ -60,8 +60,11 @@ class InitiatorApplication(Application):
         msg = fix.Message()
         msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
         msg.getHeader().setField(fix.MsgType(fix.MsgType_SecurityDefinitionRequest))
-        msg.getHeader().setField(fix.SecurityReqID("123"))
-        msg.getHeader().setField(fix.SecurityRequestType(0))
+
+        msg.setField(fix.SecurityReqID("123"))  # IRESS will set the request ID in this field.
+        msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT)) # Value of this field will be set to 0 (Snapshot)
+        msg.setField(fix.SecurityRequestType(8))  # value of this field will be set to 8 (All Securities)
+        msg.setField(fix.SecurityType(fix.SecurityType_CORPORATE_BOND))
 
         try:
             fix.Session.sendToTarget(msg, self.session_id)
@@ -74,7 +77,8 @@ class InitiatorApplication(Application):
         msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
         msg.getHeader().setField(fix.MsgType(fix.MsgType_TradeCaptureReportRequest))
         msg.getHeader().setField(fix.TradeRequestID("Trade-Request-Id"))
-        msg.setField(fix.StringField(263, fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
+        # msg.setField(fix.StringField(263, fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
+        msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
 
         try:
             fix.Session.sendToTarget(msg, self.session_id)
