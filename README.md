@@ -11,6 +11,6 @@
 4. Open another terminal window and execute to attach bash to running initiator service
     - docker exec -it client bash
 5. Execute python script in initiator's bash
-    - python initiator_runner.py
+    - python3 initiator_runner.py
 6. Press 1 to send SecurityDefinitionRequest message
 7. Logs will appear in acceptor terminal and initiator terminal
