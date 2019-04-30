@@ -6,7 +6,7 @@ VOLUME /tmp
 VOLUME /application
 
 WORKDIR /application
-COPY requirements-p27.txt /application
+COPY requirements.txt /application
 COPY . /application
 
 # install requirements

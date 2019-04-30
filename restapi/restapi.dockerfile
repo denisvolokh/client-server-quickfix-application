@@ -6,12 +6,12 @@ VOLUME /tmp
 VOLUME /application
 
 WORKDIR /application
-COPY requirements-p27.txt /application
+COPY requirements.txt /application
 COPY . /application
 
 EXPOSE 5555
 
 # install requirements
-RUN pip install -r requirements-p27.txt
+RUN pip3 install -r requirements.txt
 
-ENTRYPOINT python main.py
+ENTRYPOINT python3 main.py
