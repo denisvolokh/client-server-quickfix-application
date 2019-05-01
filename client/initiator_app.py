@@ -46,6 +46,9 @@ class InitiatorApplication(Application):
         if message_type_value == fix.MsgType(fix.MsgType_TradeCaptureReportAck).getValue():
             logger.info("   [+] Received Trade Report Ack message!")
 
+        if message_type_value == fix.MsgType(fix.MsgType_MarketDataRequestReject).getValue():
+            logger.info("   [!!!] Received Market Data Request Rejected message!")
+
         return
 
     def toAdmin(self, message, session_id):
@@ -86,6 +89,40 @@ class InitiatorApplication(Application):
         except Exception:
             logger.info("[!!!] Session Not found!")
 
+    def send_MarketDataRequest_message(self):
+        msg = fix.Message()
+        msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
+        msg.getHeader().setField(fix.MsgType(fix.MsgType_MarketDataRequest))
+        msg.setField(fix.MDReqID("Market-Data-Request-Id"))
+        msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
+        msg.setField(fix.NoMDEntryTypes(2))
+        msg.setField(fix.MDEntryType(0)) # Bid
+        msg.setField(fix.NoRelatedSym(1))
+        msg.setField(fix.SecurityID("AF2016"))
+
+        try:
+            fix.Session.sendToTarget(msg, self.session_id)
+
+        except Exception:
+            logger.info("[!!!] Session Not found!")
+
+    def send_MarketDataRequest_rejected_message(self):
+        msg = fix.Message()
+        msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
+        msg.getHeader().setField(fix.MsgType(fix.MsgType_MarketDataRequest))
+        msg.setField(fix.MDReqID("Market-Data-Request-Id-Rejected"))
+        msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
+        msg.setField(fix.NoMDEntryTypes(2))
+        msg.setField(fix.MDEntryType(0))  # Bid
+        msg.setField(fix.NoRelatedSym(1))
+        msg.setField(fix.SecurityID("AF2016"))
+
+        try:
+            fix.Session.sendToTarget(msg, self.session_id)
+
+        except Exception:
+            logger.info("[!!!] Session Not found!")
+
     # def run(self):
     #
     #     while True:
@@ -93,9 +130,11 @@ class InitiatorApplication(Application):
 
     def run(self):
 
-        print("Press 1 to send SecurityDefinitionRequest message")
-        print("Press 2 to send TradeCaptureReport request message")
-        print("Press q to quit")
+        print(">>>     Press 1 to send SecurityDefinitionRequest message")
+        print(">>>     Press 2 to send TradeCaptureReport request message")
+        print(">>>     Press 3 to send MarketDataRequest message")
+        print(">>>     Press 4 to send MarketDataRequest (Rejected) message")
+        print(">>>     Press q to quit")
 
         while True:
             _input_value = input()
@@ -105,6 +144,12 @@ class InitiatorApplication(Application):
 
             elif _input_value == "2":
                 self.send_TradeCaptureReportRequest_message()
+
+            elif _input_value == "3":
+                self.send_MarketDataRequest_message()
+
+            elif _input_value == "4":
+                self.send_MarketDataRequest_rejected_message()
 
             elif _input_value == "q":
                 break

@@ -1,0 +1,12 @@
+[
+  {
+    "trade_id": "TRADE-ID",
+    "trade_report_transaction_type": "NEW",
+    "trade_type": "REGULAR",
+    "transact_type": "20190501-12:34:56.000000",
+    "traded_price": 99.99,
+    "traded_quantity": 1234,
+    "trade_yield_percentage": 12.3,
+    "security_id": "AF2016"
+  }
+]

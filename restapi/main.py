@@ -14,5 +14,14 @@ def list_bonds():
     return jsonify(data)
 
 
+@app.route('/trades')
+def list_trades():
+
+    with open("trades.json") as f:
+        data = json.load(f)
+
+    return jsonify(data)
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5555, debug=True)
