@@ -1,5 +1,6 @@
 from quickfix import Application
 import quickfix as fix
+import quickfix50sp2 as fixn
 import requests
 import logging
 
@@ -91,19 +92,50 @@ class AcceptorApplication(Application):
         md_req_id_value = md_req_id_field.getValue()
         logger.info("   [+] Market Data Request Id: {}".format(md_req_id_value))
 
+        security_id_field = fix.SecurityID()
+        message.getField(security_id_field)
+        security_id_value = security_id_field.getValue()
+        logger.info("   [+] Security Id: {}".format(security_id_value))
+
         if "REJECT" in md_req_id_value.upper():
             reject_message = fix.Message()
             reject_message.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
             reject_message.getHeader().setField(fix.MsgType(fix.MsgType_MarketDataRequestReject))
+
             reject_message.setField(fix.MDReqID(md_req_id_value))
 
             logger.info("   [+] Sending Reject message!")
 
             try:
-                fix.Session.sendToTarget(reject_message, self.session_id)
+                fix.Session.sendToTarget(reject_message, session_id)
 
             except Exception:
                 logger.info("[!!!] Session Not found!")
+
+        else:
+            market_data_snapshot = fix.Message()
+
+            market_data_snapshot.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
+            market_data_snapshot.getHeader().setField(fix.MsgType(fix.MsgType_MarketDataSnapshotFullRefresh))
+
+            market_data_snapshot.setField(fix.ApplID("SERVER"))
+            market_data_snapshot.setField(fix.ApplSeqNum(1))
+            market_data_snapshot.setField(fix.SecurityID(security_id_value))
+
+            group = fixn.MarketDataSnapshotFullRefresh.NoMDEntries()
+            group.setField(fix.MDEntryType(fix.MDEntryType_BID))
+            group.setField(fix.MDEntryID("111"))
+            group.setField(fix.MDEntryPx(99.9))
+            group.setField(fix.Yield(0.9))
+            group.setField(fix.MDEntrySize(1234))
+            market_data_snapshot.addGroup(group)
+
+            try:
+                fix.Session.sendToTarget(market_data_snapshot, session_id)
+
+            except Exception:
+                logger.info("[!!!] Session Not found!")
+
 
 
     def _ack_trade_capture_request(self, message, session_id):

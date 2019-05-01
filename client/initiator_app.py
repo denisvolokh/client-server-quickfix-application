@@ -1,5 +1,6 @@
 from quickfix import Application
 import quickfix as fix
+import quickfix50sp2 as fixn
 import logging
 
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -90,13 +91,24 @@ class InitiatorApplication(Application):
             logger.info("[!!!] Session Not found!")
 
     def send_MarketDataRequest_message(self):
+        logger.info("[+] Sending MarketDataRequest message ...")
+
         msg = fix.Message()
         msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
         msg.getHeader().setField(fix.MsgType(fix.MsgType_MarketDataRequest))
         msg.setField(fix.MDReqID("Market-Data-Request-Id"))
         msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
+
         msg.setField(fix.NoMDEntryTypes(2))
-        msg.setField(fix.MDEntryType(0)) # Bid
+
+        group = fixn.MarketDataRequest.NoMDEntryTypes()
+
+        group.setField(fix.MDEntryType(fix.MDEntryType_BID))
+        msg.addGroup(group)
+
+        # group.setField(fix.MDEntryType(fix.MDEntryType_OFFER))
+        # msg.addGroup(group)
+
         msg.setField(fix.NoRelatedSym(1))
         msg.setField(fix.SecurityID("AF2016"))
 
@@ -107,13 +119,24 @@ class InitiatorApplication(Application):
             logger.info("[!!!] Session Not found!")
 
     def send_MarketDataRequest_rejected_message(self):
+        logger.info("[+] Sending MarketDataRequest(Rejected) message ...")
+
         msg = fix.Message()
         msg.getHeader().setField(fix.BeginString(fix.BeginString_FIX50))
         msg.getHeader().setField(fix.MsgType(fix.MsgType_MarketDataRequest))
         msg.setField(fix.MDReqID("Market-Data-Request-Id-Rejected"))
         msg.setField(fix.SubscriptionRequestType(fix.SubscriptionRequestType_SNAPSHOT_PLUS_UPDATES))
+
         msg.setField(fix.NoMDEntryTypes(2))
-        msg.setField(fix.MDEntryType(0))  # Bid
+
+        group = fixn.MarketDataRequest.NoMDEntryTypes()
+
+        group.setField(fix.MDEntryType(fix.MDEntryType_BID))
+        msg.addGroup(group)
+
+        # group.setField(fix.MDEntryType(fix.MDEntryType_OFFER))
+        # msg.addGroup(group)
+
         msg.setField(fix.NoRelatedSym(1))
         msg.setField(fix.SecurityID("AF2016"))
 
