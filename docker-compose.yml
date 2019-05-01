@@ -17,6 +17,8 @@ services:
     build:
       dockerfile: client.dockerfile
       context: ./client
+    volumes:
+      - ./client:/application
     tty: true
     links:
       - restapi
@@ -26,6 +28,8 @@ services:
     build:
       dockerfile: server.dockerfile
       context: ./server
+    volumes:
+      - ./server:/application
     links:
       - restapi
     ports:
