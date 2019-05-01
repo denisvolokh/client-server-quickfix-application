@@ -1,6 +1,6 @@
-FROM jfloff/alpine-python:2.7-slim
+FROM frolvlad/alpine-python3
 
-RUN apk add --update python-dev libxml2-dev gcc g++ musl-dev git py-pip
+RUN apk add --update python-dev libxml2-dev gcc g++ musl-dev git py-pip bash
 
 VOLUME /tmp
 VOLUME /application
