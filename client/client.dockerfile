@@ -9,6 +9,8 @@ WORKDIR /application
 COPY requirements.txt /application
 COPY . /application
 
+RUN pip install --upgrade pip
+
 # install requirements
 RUN pip3 install -r requirements.txt
 

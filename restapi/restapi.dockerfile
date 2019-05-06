@@ -11,6 +11,8 @@ COPY . /application
 
 EXPOSE 5555
 
+RUN pip install --upgrade pip
+
 # install requirements
 RUN pip3 install -r requirements.txt
 
