@@ -2,6 +2,22 @@ version: '3.3'
 
 services:
 
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - 6379:6379
+
+  generator:
+    container_name: generator
+    build:
+      dockerfile: generator.dockerfile
+      context: ./generator
+    volumes:
+      - ./generator:/code
+    links:
+      - redis
+
   restapi:
     container_name: restapi
     build:
@@ -31,6 +47,7 @@ services:
     volumes:
       - ./server:/application
     links:
+      - redis
       - restapi
     ports:
       - "3333:3333"
